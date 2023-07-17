@@ -1,4 +1,4 @@
-import * as THREE from "../webXRHello/node_modules/three/build/three.module";
+import * as THREE from "../node_modules/three/build/three.module";
 // global scene values
 var btn, gl, glCanvas, camera, scene, renderer, cube;
 
@@ -12,7 +12,7 @@ function loadScene() {
     // setup WebGL
     glCanvas = document.createElement('canvas');
     gl = glCanvas.getContext('webgl', { antialias: true });
-    
+
     // setup Three.js scene
     camera = new THREE.PerspectiveCamera(
         70,
@@ -23,55 +23,55 @@ function loadScene() {
 
     scene = new THREE.Scene();
 
-    var light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 1 );
-				light.position.set( 0.5, 1, 0.25 );
-                scene.add( light );
+    var light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+    light.position.set(0.5, 1, 0.25);
+    scene.add(light);
 
     var geometry = new THREE.BoxBufferGeometry(0.2, 0.2, 0.2);
-    var material = new THREE.MeshPhongMaterial({color: 0x89CFF0});
-    cube = new THREE.Mesh( geometry, material );
+    var material = new THREE.MeshPhongMaterial({ color: 0x89CFF0 });
+    cube = new THREE.Mesh(geometry, material);
     cube.position.y = 0.2;
-    scene.add( cube );
+    scene.add(cube);
 
     // setup Three.js WebGL renderer
     renderer = new THREE.WebGLRenderer({
         canvas: glCanvas,
         context: gl
     });
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;
-    document.body.appendChild( renderer.domElement );
+    document.body.appendChild(renderer.domElement);
 }
 
 function init() {
-        navigator.xr.isSessionSupported('immersive-ar')
-            .then((supported) => {
-                if (supported) {
-                    btn = document.createElement("button");
-                    btn.addEventListener('click', onRequestSession);
-                    btn.innerHTML = "Enter XR";
-                    var header = document.querySelector("header");
-                    header.appendChild(btn);
-                }
-                else {
-                    navigator.xr.isSessionSupported('inline')
-                        .then((supported) => {
-                            if (supported) {
-                                console.log('inline session supported')
-                            }
-                            else {console.log('inline not supported')};
-                        })
-                }
-            })
-            .catch((reason) => {
-                console.log('WebXR not supported: ' + reason);
-            });
+    navigator.xr.isSessionSupported('immersive-ar')
+        .then((supported) => {
+            if (supported) {
+                btn = document.createElement("button");
+                btn.addEventListener('click', onRequestSession);
+                btn.innerHTML = "Enter XR";
+                var header = document.querySelector("header");
+                header.appendChild(btn);
+            }
+            else {
+                navigator.xr.isSessionSupported('inline')
+                    .then((supported) => {
+                        if (supported) {
+                            console.log('inline session supported')
+                        }
+                        else { console.log('inline not supported') };
+                    })
+            }
+        })
+        .catch((reason) => {
+            console.log('WebXR not supported: ' + reason);
+        });
 }
 
 function onRequestSession() {
     console.log("requesting session");
-    navigator.xr.requestSession('immersive-ar', {requiredFeatures: ['viewer', 'local']})
+    navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['viewer', 'local'] })
         .then(onSessionStarted)
         .catch((reason) => {
             console.log('request disabled: ' + reason);
@@ -86,7 +86,7 @@ function onSessionStarted(session) {
     xrSession = session;
     xrSession.addEventListener("end", onSessionEnd);
     setupWebGLLayer()
-        .then(()=> {
+        .then(() => {
             renderer.xr.setReferenceSpaceType('local');
             renderer.xr.setSession(xrSession);
             animate();
@@ -95,7 +95,7 @@ function onSessionStarted(session) {
 
 function setupWebGLLayer() {
     return gl.makeXRCompatible().then(() => {
-        xrSession.updateRenderState( {baseLayer: new XRWebGLLayer(xrSession, gl) });
+        xrSession.updateRenderState({ baseLayer: new XRWebGLLayer(xrSession, gl) });
     });
 }
 
